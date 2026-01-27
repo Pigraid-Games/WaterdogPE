@@ -17,7 +17,6 @@ package dev.waterdog.waterdogpe.event;
 
 import dev.waterdog.waterdogpe.ProxyServer;
 import dev.waterdog.waterdogpe.utils.ThreadFactoryBuilder;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.concurrent.*;
 import java.util.function.Consumer;
@@ -31,7 +30,7 @@ public class EventManager {
 
     private final ProxyServer proxy;
     private final ExecutorService threadedExecutor;
-    private final Object2ObjectOpenHashMap<Class<? extends Event>, EventHandler> handlerMap = new Object2ObjectOpenHashMap<>();
+    private final ConcurrentHashMap<Class<? extends Event>, EventHandler> handlerMap = new ConcurrentHashMap<>();
 
     public EventManager(ProxyServer proxy) {
         this.proxy = proxy;
