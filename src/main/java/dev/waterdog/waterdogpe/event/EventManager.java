@@ -17,6 +17,8 @@ package dev.waterdog.waterdogpe.event;
 
 import dev.waterdog.waterdogpe.ProxyServer;
 import dev.waterdog.waterdogpe.utils.ThreadFactoryBuilder;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import lombok.Getter;
 
 import java.util.concurrent.*;
 import java.util.function.Consumer;
@@ -29,6 +31,7 @@ import java.util.function.Consumer;
 public class EventManager {
 
     private final ProxyServer proxy;
+    @Getter
     private final ExecutorService threadedExecutor;
     private final ConcurrentHashMap<Class<? extends Event>, EventHandler> handlerMap = new ConcurrentHashMap<>();
 
@@ -74,7 +77,4 @@ public class EventManager {
         return eventHandler.handle(event);
     }
 
-    public ExecutorService getThreadedExecutor() {
-        return this.threadedExecutor;
-    }
 }
