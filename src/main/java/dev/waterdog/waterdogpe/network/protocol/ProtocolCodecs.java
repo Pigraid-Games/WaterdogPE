@@ -17,8 +17,10 @@ package dev.waterdog.waterdogpe.network.protocol;
 
 import dev.waterdog.waterdogpe.network.protocol.updaters.CodecUpdater419;
 import dev.waterdog.waterdogpe.network.protocol.updaters.ProtocolCodecUpdater;
+import dev.waterdog.waterdogpe.logger.MainLogger;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.cloudburstmc.protocol.bedrock.codec.BedrockCodec;
+import org.cloudburstmc.protocol.bedrock.data.PacketRecipient;
 import org.cloudburstmc.protocol.bedrock.packet.*;
 
 import java.util.ArrayList;
@@ -122,7 +124,15 @@ public class ProtocolCodecs {
     }
 
     private static final List<ProtocolCodecUpdater> UPDATERS = new ObjectArrayList<>();
-    private static final ProtocolCodecUpdater DEFAULT_UPDATER = (builder, codec) -> builder.retainPackets(HANDLED_PACKETS.toArray(new Class[]{}));
+    private static final ProtocolCodecUpdater DEFAULT_UPDATER = (builder, codec) -> {
+        // First retain the handled packets for passthrough (server→proxy→client)
+        builder.retainPackets(HANDLED_PACKETS.toArray(new Class[]{}));
+
+        // Note: Sound packets (LevelSoundEvent1/2/Event) are already in HANDLED_PACKETS
+        // and will be retained by retainPackets() above. No explicit registration needed.
+
+        return builder;
+    };
     static {
         UPDATERS.add(new CodecUpdater419());
     }

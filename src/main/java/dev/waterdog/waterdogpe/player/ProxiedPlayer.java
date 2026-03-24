@@ -559,6 +559,46 @@ public class ProxiedPlayer implements CommandSender {
     }
 
     /**
+     * Plays a sound to the player
+     *
+     * @param soundEvent the sound event to play
+     */
+    public void playSound(org.cloudburstmc.protocol.bedrock.data.SoundEvent soundEvent) {
+        // Try sending through downstream connection to let the server handle it
+        ClientConnection downstream = this.getDownstreamConnection();
+        if (downstream != null && downstream.isConnected()) {
+            org.cloudburstmc.protocol.bedrock.packet.LevelSoundEventPacket packet = new org.cloudburstmc.protocol.bedrock.packet.LevelSoundEventPacket();
+            packet.setSound(soundEvent);
+            packet.setPosition(org.cloudburstmc.math.vector.Vector3f.ZERO);
+            packet.setExtraData(-1);
+            packet.setIdentifier("");
+            packet.setBabySound(false);
+            packet.setRelativeVolumeDisabled(false);
+
+            this.getLogger().debug("[{}] Sending sound packet via downstream: {}", this.getName(), soundEvent);
+            downstream.sendPacket(packet);
+            return;
+        }
+
+        // Fallback: try sending directly to upstream client
+        if (this.connection == null || !this.connection.isConnected()) {
+            this.getLogger().debug("[{}] Cannot play sound - no connection available", this.getName());
+            return;
+        }
+
+        org.cloudburstmc.protocol.bedrock.packet.LevelSoundEventPacket packet = new org.cloudburstmc.protocol.bedrock.packet.LevelSoundEventPacket();
+        packet.setSound(soundEvent);
+        packet.setPosition(org.cloudburstmc.math.vector.Vector3f.ZERO);
+        packet.setExtraData(-1);
+        packet.setIdentifier("");
+        packet.setBabySound(false);
+        packet.setRelativeVolumeDisabled(false);
+
+        this.getLogger().debug("[{}] Sending sound packet via upstream: {}", this.getName(), soundEvent);
+        this.sendPacket(packet);  // Changed from sendPacketImmediately
+    }
+
+    /**
      * Sends a subtitle in addition to a title
      *
      * @param subtitle the subtitle to send as a string
